@@ -1,0 +1,14 @@
+{
+  "name": "naru-survivor",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Una aventura de supervivencia shinobi con Node.js y Canvas 2D",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

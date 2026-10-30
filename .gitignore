@@ -1,0 +1,13 @@
+node_modules/
+dist/
+tmp/
+*.log
+*.tar.gz
+.env
+.env.*
+.openai/
+.sites/
+# Separate checkout retained for the previously published Sites version.
+naru-survivor/
+# Local review images are not game assets.
+/naru-survivor-*.png

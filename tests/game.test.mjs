@@ -43,6 +43,32 @@ test('un proyectil consume su penetración sin dañar a toda una fila',()=>{
  g.shots=[{x:1400,y:1300,vx:0,vy:0,r:14,damage:30,color:'#fff',life:2,hits:new Set(),maxHits:2}];g.update(.016);
  assert.equal(g.enemies.filter(e=>e.hp<100).length,2);assert.equal(g.shots.length,0);
 });
+test('Rasengan en nivel 1 puede impactar a 3 enemigos distintos',()=>{
+  const g=new Game(CHARACTERS[0],'chunin',42);g.obstacles=[];g.spawnTimer=100;g.scrolls=[];g.skills[0].timer=100;
+  for(let i=0;i<5;i++){const e=g.spawnEnemy();e.x=1400;e.y=1300;e.hp=e.maxHp=100;e.speed=0;}
+  g.shots=[{x:1400,y:1300,vx:0,vy:0,r:14,damage:30,color:'#fff',life:2,hits:new Set(),maxHits:3,id:'rasengan'}];g.update(.016);
+  assert.equal(g.enemies.filter(e=>e.hp<100).length,3);assert.equal(g.shots.length,0);
+});
+test('cast de Rasengan asigna penetración 3 en nivel 1',()=>{
+  const g=new Game(CHARACTERS[0],'chunin',42);g.obstacles=[];g.spawnTimer=100;g.scrolls=[];
+  const e=g.spawnEnemy();e.x=1400;e.y=1300;e.hp=e.maxHp=100;e.speed=0;
+  g.cast(g.skills[0]);
+  assert.equal(g.shots.length,1);assert.equal(g.shots[0].id,'rasengan');assert.equal(g.shots[0].maxHits,3);
+});
+test('otras habilidades de proyectil conservan penetración 2',()=>{
+  const g=new Game(CHARACTERS[1],'chunin',42);g.obstacles=[];g.spawnTimer=100;g.scrolls=[];
+  assert.ok(g.addSkill('katon'));
+  const e=g.spawnEnemy();e.x=1400;e.y=1300;e.hp=e.maxHp=100;e.speed=0;
+  g.cast(g.skills[1]);
+  assert.equal(g.shots.length,1);assert.equal(g.shots[0].id,'katon');assert.equal(g.shots[0].maxHits,2);
+});
+test('las habilidades burst conservan penetración 1',()=>{
+  const g=new Game(CHARACTERS[0],'chunin',42);g.obstacles=[];g.spawnTimer=100;g.scrolls=[];
+  assert.ok(g.addSkill('rasenshuriken'));
+  const e=g.spawnEnemy();e.x=1400;e.y=1300;e.hp=e.maxHp=100;e.speed=0;
+  g.cast(g.skills[1]);
+  assert.ok(g.shots.length>0);assert.ok(g.shots.every(s=>s.maxHits===1));
+});
 test('los ANBU avisan antes de disparar y el kunai se bloquea con terreno',()=>{
  const g=new Game(CHARACTERS[0],'chunin',42);g.time=50;g.obstacles=[];g.scrolls=[];g.spawnTimer=100;g.skills[0].timer=100;
  const e=g.spawnEnemy();e.type='anbu';e.x=g.player.x+180;e.y=g.player.y;e.throwTimer=0;e.speed=0;

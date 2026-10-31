@@ -69,7 +69,7 @@ export class Game {
   if(def.type==='shot'||def.type==='burst'){
    if(!near.length)return;
    const a=Math.atan2(near[0].y-p.y,near[0].x-p.x),count=def.type==='burst'?6+s.level*2:1+Math.floor((s.level-1)/3);
-   for(let i=0;i<count;i++){const angle=def.type==='burst'?a+i/count*TAU:a+(i-(count-1)/2)*.2;this.shots.push({x:p.x,y:p.y,vx:Math.cos(angle)*360,vy:Math.sin(angle)*360,r:s.id==='katon'?16:10+s.level*.5,damage,color,life:2.2,hits:new Set(),maxHits:(def.type==='burst'?1:2)+Math.floor((s.level-1)/3),id:s.id});}
+   for(let i=0;i<count;i++){const angle=def.type==='burst'?a+i/count*TAU:a+(i-(count-1)/2)*.2;this.shots.push({x:p.x,y:p.y,vx:Math.cos(angle)*360,vy:Math.sin(angle)*360,r:s.id==='katon'?16:10+s.level*.5,damage,color,life:2.2,hits:new Set(),maxHits:(def.type==='burst'?1:s.id==='rasengan'?3:2)+Math.floor((s.level-1)/3),id:s.id});}
   }else if(def.type==='chain'){
    const targets=near.filter(e=>distance(e,p)<440).slice(0,3+Math.floor(s.level/2));let prev=p;
    for(const e of targets){this.hit(e,damage,color);this.effects.push({type:'line',x:prev.x,y:prev.y,x2:e.x,y2:e.y,color,life:.24,maxLife:.24});prev=e;}

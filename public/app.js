@@ -1,5 +1,5 @@
 import { CHARACTERS, SKILLS, DIFFICULTIES } from './data.js';
-import { portrait } from './portraits.js?v=1.3';
+import { portrait } from './portraits.js?v=1.5';
 import { Game, Renderer, DURATION } from './engine.js';
 import { BALANCE } from './balance.js';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];

@@ -1,6 +1,6 @@
 {
   "name": "naru-survivor",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "private": true,
   "type": "module",
   "description": "Una aventura de supervivencia shinobi con Node.js y Canvas 2D",

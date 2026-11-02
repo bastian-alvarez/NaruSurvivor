@@ -158,3 +158,40 @@ footer{border-top:3px solid #344733}
   #play-page footer { margin-top:13px; }
 }
 @media (max-width:580px) { .sidebar .sound-toggle { display:none; } }
+
+/* 1.7 — title screen con menú clásico de videojuego */
+@media (min-width:581px) {
+  #title-screen { position:relative; min-height:calc(100vh - 68px); overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; isolation:isolate; background:#10170f; }
+  #title-screen:before { content:''; position:absolute; inset:0; z-index:-2; background:url('./assets/konoha-pixel.png') center 48%/cover; image-rendering:pixelated; transform:scale(1.025); }
+  #title-screen:after { content:''; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,#10150d6e 0%,#11160a24 35%,#11150c63 72%,#090c0aeb 100%),linear-gradient(90deg,#10150a7d,transparent 44%,#090d096b); }
+  #title-screen.hidden { display:none; }
+  .title-copy { text-align:center; margin-top:-34px; text-shadow:4px 4px 0 #10120b,7px 7px 0 #070907; }
+  .title-kicker { display:inline-block; padding:8px 12px; color:#ddd5ad; border-top:2px solid #bd8749; border-bottom:2px solid #bd8749; background:#101710b5; font-size:9px; letter-spacing:3px; }
+  .title-copy h1 { margin:17px 0 2px; font-size:clamp(56px,9vw,116px); line-height:.9; letter-spacing:-.085em; color:#f2e8c8; -webkit-text-stroke:1px #16170e; }
+  .title-copy h1 span { color:#f0a049; }
+  .title-copy p { margin:17px 0; color:#e0d6b7; font-size:10px; letter-spacing:5px; }
+  .title-start { margin-top:27px; width:270px; min-height:78px; display:flex; align-items:center; justify-content:center; gap:24px; color:#f7edcf; background:#a53b22; border:4px solid #e7bd77; box-shadow:inset 0 0 0 3px #56251d,0 7px 0 #27160f,0 12px 25px #050805a8; font:700 34px 'Courier New',monospace; text-shadow:2px 2px #432016; image-rendering:pixelated; }
+  .title-start span { font-size:19px; color:#f4cb73; }
+  .title-start:hover { background:#c34c29; transform:translateY(-2px); }
+  .title-menu { display:flex; gap:0; margin-top:32px; background:#10150fe0; border:3px solid #7c653e; box-shadow:4px 4px 0 #090b08; }
+  .title-menu button { min-width:148px; padding:14px 15px; color:#e9ddba; background:transparent; border-right:2px solid #4a432d; font:700 11px 'Courier New',monospace; letter-spacing:1px; }
+  .title-menu button:last-child { border:0; }
+  .title-menu button:hover { color:#ffd083; background:#8c462c; }
+  .title-version { position:absolute; bottom:17px; right:23px; color:#e0dcc6; font-size:8px; letter-spacing:2px; text-shadow:1px 2px #090b08; }
+}
+@media (max-width:580px) {
+  #title-screen { position:relative; min-height:calc(100svh - 64px); margin:-57px -16px 0; padding:25px 16px 75px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; isolation:isolate; background:#10170f; }
+  #title-screen:before { content:''; position:absolute; inset:0; z-index:-2; background:url('./assets/konoha-pixel.png') center/cover; image-rendering:pixelated; }
+  #title-screen:after { content:''; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,#11160972,#0b100bdc); }
+  #title-screen.hidden { display:none; }
+  .title-copy { text-align:center; }
+  .title-kicker { font-size:7px; letter-spacing:2px; color:#e4d7b7; }
+  .title-copy h1 { margin:15px 0 0; color:#f2e8c8; font-size:clamp(42px,13vw,68px); line-height:.92; letter-spacing:-.09em; text-shadow:3px 3px #11120d; }
+  .title-copy h1 span { color:#f0a049; }
+  .title-copy p { margin:13px 0; color:#e0d6b7; font-size:8px; letter-spacing:3px; }
+  .title-start { margin-top:24px; width:min(260px,82vw); min-height:66px; border:4px solid #e7bd77; box-shadow:inset 0 0 0 3px #56251d,0 6px 0 #27160f; color:#f7edcf; background:#a53b22; font:700 28px 'Courier New',monospace; }
+  .title-start span { margin-left:20px; color:#f4cb73; }
+  .title-menu { display:grid; grid-template-columns:1fr 1fr; width:min(320px,90vw); margin-top:24px; border:3px solid #7c653e; background:#10150fe8; box-shadow:3px 3px #090b08; }
+  .title-menu button { min-height:44px; color:#e9ddba; background:transparent; border:1px solid #4a432d; font:700 9px 'Courier New',monospace; letter-spacing:.6px; }
+  .title-version { position:absolute; bottom:73px; right:13px; color:#ddd5bd; font-size:7px; text-shadow:1px 1px #090b08; }
+}

@@ -10,9 +10,9 @@ export class Game {
  constructor(character,difficulty='chunin',seed=Date.now()){
   this.character=character;this.difficulty=difficulty;this.rules=DIFFICULTIES[difficulty];this.random=rng(seed);
   this.time=0;this.level=1;this.xp=0;this.nextXp=BALANCE.startingXp;this.kills=0;this.status='playing';this.bossIndex=0;this.bossesDefeated=0;
-  this.player={x:1300,y:1300,r:13,hp:character.hp,maxHp:character.hp,speed:character.speed,power:character.power||1,invulnerable:2,dash:0,dashCooldown:0,facing:1,moving:false};
-  this.skills=[{id:character.skills[0],level:1,timer:.3}];this.enemies=[];this.shots=[];this.enemyShots=[];this.gems=[];this.effects=[];this.scrolls=[];this.obstacles=[];this.decor=[];this.landmarks=[];this.orbitHits=new Map();this.spawnTimer=0;this.scrollTimer=BALANCE.scrollInterval;this.onEvent=()=>{};
-  this.enemyId=0;this.generateMap();this.scrolls.push({x:1510,y:1280,r:15});
+  this.player={x:1300,y:1300,r:13,hp:character.hp,maxHp:character.hp,speed:character.speed,power:character.power||1,speedBoost:0,invulnerable:2,dash:0,dashCooldown:0,facing:1,moving:false};
+  this.skills=[{id:character.skills[0],level:1,timer:.3}];this.enemies=[];this.shots=[];this.enemyShots=[];this.gems=[];this.effects=[];this.scrolls=[];this.pickups=[];this.obstacles=[];this.decor=[];this.landmarks=[];this.orbitHits=new Map();this.spawnTimer=0;this.scrollTimer=BALANCE.scrollInterval;this.pickupTimer=26;this.onEvent=()=>{};
+  this.enemyId=0;this.generateMap();this.scrolls.push({x:1510,y:1280,r:15});this.pickups.push({x:1110,y:1370,r:16,type:'heart',life:150});
  }
  generateMap(){
   for(let i=0;i<175;i++){
@@ -55,7 +55,7 @@ export class Game {
   const type=boss?'boss':this.random()<(this.time>15?.28:0)?'hound':this.random()<(this.time>45?.17:0)?'anbu':'ninja';
   const stats=BALANCE.enemies[type];
   const hp=(boss?2000+this.bossIndex*1700:stats.hp)*(1+(boss?0:this.time/250))*this.rules.hp;
-  const enemy={id:++this.enemyId,x,y,r:boss?50:type==='hound'?11:13,type,hp,maxHp:hp,speed:boss?76:stats.speed,damage:(boss?36:stats.damage)*this.rules.damage,slow:0,flash:0,attackTimer:2,bossNumber:this.bossIndex,throwTimer:3+this.random()*2,windup:0,aim:0};
+  const enemy={id:++this.enemyId,x,y,r:boss?50:type==='hound'?11:13,type,hp,maxHp:hp,speed:boss?76:stats.speed,damage:(boss?33:stats.damage)*this.rules.damage,slow:0,flash:0,attackTimer:2,bossNumber:this.bossIndex,throwTimer:3+this.random()*2,windup:0,aim:0};
   this.enemies.push(enemy);if(boss){this.bossIndex++;this.onEvent('boss',BOSS_NAMES[this.bossIndex-1]);}return enemy;
  }
  hit(e,damage,color){if(e.hp<=0)return;e.hp-=damage;e.flash=.12;if(this.character.slow||['palm','tsukuyomi'].some(id=>this.skills.some(s=>s.id===id)))e.slow=1.1;
@@ -81,19 +81,20 @@ export class Game {
  update(dt,input={x:0,y:0}){
   if(this.status!=='playing')return;dt=Math.min(dt,.05);const p=this.player;this.time+=dt;
   if(this.xp>=this.nextXp){this.xp-=this.nextXp;this.level++;this.nextXp=BALANCE.levelXp(this.level);this.status='levelup';this.onEvent('levelup');return;}
-  p.invulnerable=Math.max(0,p.invulnerable-dt);p.dashCooldown=Math.max(0,p.dashCooldown-dt);p.dash=Math.max(0,p.dash-dt);p.hp=Math.min(p.maxHp,p.hp+(this.character.regen||BALANCE.baseRegen)*dt);
+  p.invulnerable=Math.max(0,p.invulnerable-dt);p.dashCooldown=Math.max(0,p.dashCooldown-dt);p.dash=Math.max(0,p.dash-dt);p.speedBoost=Math.max(0,p.speedBoost-dt);p.hp=Math.min(p.maxHp,p.hp+(this.character.regen||BALANCE.baseRegen)*dt);
   const len=Math.hypot(input.x,input.y)||1;const mx=input.x/Math.max(1,len),my=input.y/Math.max(1,len);p.moving=!!(mx||my);if(mx)p.facing=Math.sign(mx);
-  this.move(p,mx*p.speed*(p.dash>0?3.5:1)*dt,my*p.speed*(p.dash>0?3.5:1)*dt);
+  this.move(p,mx*p.speed*(p.dash>0?3.5:p.speedBoost>0?1.35:1)*dt,my*p.speed*(p.dash>0?3.5:p.speedBoost>0?1.35:1)*dt);
   this.spawnTimer-=dt;if(this.spawnTimer<=0&&this.enemies.length<BALANCE.enemyCap){const n=Math.min(BALANCE.waveSize(this.time),BALANCE.enemyCap-this.enemies.length);for(let i=0;i<n;i++)this.spawnEnemy();this.spawnTimer=BALANCE.spawnInterval(this.time)/this.rules.spawn;}
   if(this.bossIndex<3&&this.time>=[150,330,480][this.bossIndex]&&!this.enemies.some(e=>e.type==='boss'&&e.hp>0))this.spawnEnemy(true);
   this.scrollTimer-=dt;if(this.scrollTimer<=0&&this.scrolls.length<5){const a=this.random()*TAU;let pos={x:clamp(p.x+Math.cos(a)*300,40,WORLD-40),y:clamp(p.y+Math.sin(a)*300,40,WORLD-40),r:15};if(!this.isBlocked(pos.x,pos.y,20))this.scrolls.push(pos);this.scrollTimer=BALANCE.scrollInterval;}
+  this.pickupTimer-=dt;if(this.pickupTimer<=0){if(this.pickups.length<4){for(let i=0;i<12;i++){const a=this.random()*TAU,d=220+this.random()*280,pos={x:clamp(p.x+Math.cos(a)*d,40,WORLD-40),y:clamp(p.y+Math.sin(a)*d,40,WORLD-40),r:16,type:this.random()<.56?'heart':'wings',life:150};if(!this.isBlocked(pos.x,pos.y,20)){this.pickups.push(pos);break;}}}this.pickupTimer=43+this.random()*20;}
   for(const s of this.skills){s.timer-=dt;if(s.timer<=0){this.cast(s);s.timer=SKILLS[s.id].cooldown*(this.character.cooldown||1)/(1+(s.level-1)*.06);}}
   for(const e of this.enemies){if(e.hp<=0)continue;e.flash=Math.max(0,e.flash-dt);e.slow=Math.max(0,e.slow-dt);const a=Math.atan2(p.y-e.y,p.x-e.x),speed=e.speed*(1+this.time/900)*(e.slow>0?.4:1);
    this.move(e,Math.cos(a)*speed*dt,Math.sin(a)*speed*dt);
    // Tangential steering lets enemies find their way around ponds and boulders.
    if(this.isBlocked(e.x+Math.cos(a)*18,e.y+Math.sin(a)*18,e.r))this.move(e,-Math.sin(a)*speed*dt,Math.cos(a)*speed*dt);
    if(distance(e,p)<e.r+p.r&&p.invulnerable<=0){p.hp-=e.damage;p.invulnerable=BALANCE.contactGrace;this.onEvent('hurt');}
-   if(e.type==='anbu'&&this.time>=45){e.throwTimer-=dt;if(e.windup>0){e.windup-=dt;if(e.windup<=0&&this.enemyShots.length<90){this.enemyShots.push({x:e.x,y:e.y,vx:Math.cos(e.aim)*245,vy:Math.sin(e.aim)*245,angle:e.aim,life:2.5,damage:16*this.rules.damage,r:5});}}else if(e.throwTimer<=0&&distance(e,p)<480){e.aim=Math.atan2(p.y-e.y,p.x-e.x);e.windup=.65;e.throwTimer=4.6;}}
+   if(e.type==='anbu'&&this.time>=45){e.throwTimer-=dt;if(e.windup>0){e.windup-=dt;if(e.windup<=0&&this.enemyShots.length<90){this.enemyShots.push({x:e.x,y:e.y,vx:Math.cos(e.aim)*245,vy:Math.sin(e.aim)*245,angle:e.aim,life:2.5,damage:14*this.rules.damage,r:5});}}else if(e.throwTimer<=0&&distance(e,p)<480){e.aim=Math.atan2(p.y-e.y,p.x-e.x);e.windup=.65;e.throwTimer=4.6;}}
    if(e.type==='boss'){e.attackTimer-=dt;if(e.attackTimer<=0){const count=[1,3,5][e.bossNumber];for(let i=0;i<count;i++){const angle=i/count*TAU;this.effects.push({type:'warning',x:clamp(p.x+(i?Math.cos(angle)*125:0),0,WORLD),y:clamp(p.y+(i?Math.sin(angle)*125:0),0,WORLD),r:e.bossNumber===0?110:70,life:1.35,maxLife:1.35,triggered:false,damage:e.damage});}e.attackTimer=4.5-e.bossNumber*.4;}}
   }
   for(const s of this.skills.filter(s=>SKILLS[s.id].type==='orbit')){const count=s.id==='clones'?2+Math.floor(s.level/3):2;for(let i=0;i<count;i++){const a=this.time*2+i/count*TAU,orb={x:p.x+Math.cos(a)*75,y:p.y+Math.sin(a)*75};for(const e of this.enemies){const key=s.id+':'+e.id;if(e.hp>0&&distance(e,orb)<e.r+19&&(this.orbitHits.get(key)||0)<this.time){this.hit(e,SKILLS[s.id].damage*(1+.3*(s.level-1))*p.power,SKILLS[s.id].color);this.orbitHits.set(key,this.time+.6);}}}}
@@ -102,8 +103,9 @@ export class Game {
   this.enemyShots=this.enemyShots.filter(s=>s.life>0);
   const magnet=80*(this.character.pickup||1);for(const g of this.gems){const d=distance(g,p);if(d<magnet){const a=Math.atan2(p.y-g.y,p.x-g.x);g.x+=Math.cos(a)*340*dt;g.y+=Math.sin(a)*340*dt;}if(d<20){if(g.heal)p.hp=Math.min(p.maxHp,p.hp+g.heal);else this.collectXp(g.value);g.collected=true;}}
   for(const scroll of this.scrolls){if(distance(scroll,p)<30){scroll.collected=true;this.status='scroll';this.onEvent('scroll');break;}}
+  for(const item of this.pickups){item.life-=dt;if(distance(item,p)<30){item.collected=true;if(item.type==='heart'){const healed=Math.min(35,p.maxHp-p.hp);p.hp+=healed;this.onEvent('pickup',{type:'heart',amount:healed});}else{p.speedBoost=8;this.onEvent('pickup',{type:'wings',seconds:8});}}}
   for(const fx of this.effects){fx.life-=dt;if(fx.type==='warning'&&fx.life<=.2&&!fx.triggered){fx.triggered=true;if(distance(fx,p)<fx.r&&p.invulnerable<=0){p.hp-=fx.damage;p.invulnerable=.7;this.onEvent('hurt');}}}
-  this.effects=this.effects.filter(f=>f.life>0).slice(-260);this.shots=this.shots.filter(s=>s.life>0);this.gems=this.gems.filter(g=>!g.collected);this.scrolls=this.scrolls.filter(s=>!s.collected);
+  this.effects=this.effects.filter(f=>f.life>0).slice(-260);this.shots=this.shots.filter(s=>s.life>0);this.gems=this.gems.filter(g=>!g.collected);this.scrolls=this.scrolls.filter(s=>!s.collected);this.pickups=this.pickups.filter(s=>!s.collected&&s.life>0);
   const dead=new Set(this.enemies.filter(e=>e.hp<=0).map(e=>e.id));this.enemies=this.enemies.filter(e=>e.hp>0);for(const key of this.orbitHits.keys())if(dead.has(Number(key.split(':')[1])))this.orbitHits.delete(key);
   // Compact old gems into bundles without losing experience.
   if(this.gems.length>650){const old=this.gems.splice(0,300);const value=old.reduce((sum,g)=>sum+g.value,0);this.gems.push({x:old[0].x,y:old[0].y,value});}
@@ -133,6 +135,7 @@ export class Renderer {
   for(const o of game.landmarks)if(visible(o,150))drawLandmark(c,o,game.time);
   for(const gem of game.gems){if(!visible(gem,15))continue;c.save();c.translate(gem.x,gem.y);c.rotate(Math.PI/4);c.fillStyle=gem.heal?'#f1ae95':gem.value>4?'#c8b9f0':'#8ad8c6';c.fillRect(-3.5,-3.5,7,7);c.restore();}
   for(const s of game.scrolls){if(!visible(s,30))continue;this.circle(s.x,s.y,24,'#e9b65d14');c.save();c.translate(s.x,s.y+Math.sin(game.time*3)*3);c.fillStyle='#d9cba0';c.fillRect(-10,-9,20,18);c.fillStyle='#a85b42';c.fillRect(-13,-12,5,24);c.fillRect(8,-12,5,24);c.fillStyle='#655641';c.font='13px serif';c.textAlign='center';c.fillText('忍',0,5);c.restore();}
+  for(const item of game.pickups){if(!visible(item,32))continue;const bob=Math.sin(game.time*4+item.x)*3;this.circle(item.x,item.y,25,item.type==='heart'?'#f17e6b28':'#91d4b326',item.type==='heart'?'#f19b80aa':'#9ee1bd99');c.save();c.translate(item.x,item.y+bob);c.textAlign='center';c.textBaseline='middle';c.font='bold 25px sans-serif';c.shadowColor=item.type==='heart'?'#f06e55':'#87e3b0';c.shadowBlur=15;c.fillStyle=item.type==='heart'?'#f28c78':'#a3e6b3';c.fillText(item.type==='heart'?'♥':'翼',0,1);c.restore();}
   for(const fx of game.effects.filter(f=>f.type==='warning')){this.circle(fx.x,fx.y,fx.r,`rgba(211,92,51,${.08+(1-fx.life/fx.maxLife)*.22})`,'#e59965');this.circle(fx.x,fx.y,fx.r*(1-fx.life/fx.maxLife),null,'#e9af7c');}
   const entities=[...game.enemies.filter(e=>visible(e,140)),{...p,type:'player'}].sort((a,b)=>a.y-b.y);
   for(const e of entities){if(e.type==='player'){
@@ -159,5 +162,5 @@ export class Renderer {
   if(!this.reducedMotion){for(let i=0;i<12;i++){const x=cam.x+((i*137+game.time*13)%vw),y=cam.y+((i*97+game.time*19)%vh);c.save();c.translate(x,y);c.rotate(game.time+i);c.fillStyle='#c6b36d88';c.fillRect(-2,-1,5,2);c.restore();}}
   c.restore();const vignette=c.createRadialGradient(w/2,h/2,h*.2,w/2,h/2,Math.max(w,h)*.65);vignette.addColorStop(0,'#09180e00');vignette.addColorStop(1,'#09180e88');c.fillStyle=vignette;c.fillRect(0,0,w,h);this.drawMap(game);
  }
- drawMap(game){const c=this.mctx,s=150/WORLD;c.clearRect(0,0,150,150);c.fillStyle='#263d2a';c.fillRect(0,0,150,150);for(const o of game.obstacles){c.fillStyle=o.type==='water'?'#59988d':o.type==='rock'?'#889078':'#3b5c38';c.beginPath();c.arc(o.x*s,o.y*s,o.r*s+1,0,TAU);c.fill();}for(const scroll of game.scrolls){c.fillStyle='#e9ba68';c.fillRect(scroll.x*s-2,scroll.y*s-2,4,4);}for(const e of game.enemies.filter(e=>e.type==='boss')){c.fillStyle='#ef9467';c.beginPath();c.arc(e.x*s,e.y*s,4,0,TAU);c.fill();}c.fillStyle='#f2e8bd';c.beginPath();c.arc(game.player.x*s,game.player.y*s,3,0,TAU);c.fill();c.strokeStyle='#d3e3c13f';c.strokeRect(this.camera.x*s,this.camera.y*s,this.width/(this.width<600?.9:1.1)*s,this.height/(this.width<600?.9:1.1)*s);}
+ drawMap(game){const c=this.mctx,s=150/WORLD;c.clearRect(0,0,150,150);c.fillStyle='#263d2a';c.fillRect(0,0,150,150);for(const o of game.obstacles){c.fillStyle=o.type==='water'?'#59988d':o.type==='rock'?'#889078':'#3b5c38';c.beginPath();c.arc(o.x*s,o.y*s,o.r*s+1,0,TAU);c.fill();}for(const scroll of game.scrolls){c.fillStyle='#e9ba68';c.fillRect(scroll.x*s-2,scroll.y*s-2,4,4);}for(const item of game.pickups){c.fillStyle=item.type==='heart'?'#ff917e':'#a5e6b3';c.beginPath();c.arc(item.x*s,item.y*s,3,0,TAU);c.fill();}for(const e of game.enemies.filter(e=>e.type==='boss')){c.fillStyle='#ef9467';c.beginPath();c.arc(e.x*s,e.y*s,4,0,TAU);c.fill();}c.fillStyle='#f2e8bd';c.beginPath();c.arc(game.player.x*s,game.player.y*s,3,0,TAU);c.fill();c.strokeStyle='#d3e3c13f';c.strokeRect(this.camera.x*s,this.camera.y*s,this.width/(this.width<600?.9:1.1)*s,this.height/(this.width<600?.9:1.1)*s);}
 }

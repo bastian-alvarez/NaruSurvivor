@@ -14,6 +14,11 @@ test('el inventario no supera tres jutsus y permite reemplazar uno',()=>{
 test('el impulso no atraviesa obstáculos ni límites del mapa',()=>{
  const g=new Game(CHARACTERS[0],'chunin',42);g.obstacles=[{x:1350,y:1300,r:20,type:'rock'}];g.move(g.player,400,0);assert.ok(g.player.x<1318);g.player.x=WORLD-15;g.move(g.player,400,0);assert.ok(g.player.x<=WORLD-g.player.r);
 });
+test('los suministros curan vida y dan velocidad breve; las oleadas y golpes son más moderados',()=>{
+ const g=new Game(CHARACTERS[0],'chunin',42);assert.ok(BALANCE.spawnInterval(0)>1.45);assert.ok(BALANCE.enemies.ninja.damage<18);assert.ok(BALANCE.enemies.hound.damage<14);assert.ok(BALANCE.enemies.anbu.damage<25);
+ g.obstacles=[];g.player.hp=50;g.spawnTimer=100;g.scrollTimer=100;g.pickups=[{x:g.player.x,y:g.player.y,r:16,type:'heart',life:20}];let found;g.onEvent=(name,data)=>{if(name==='pickup')found=data;};g.update(.05);assert.ok(g.player.hp>=85&&g.player.hp<86);assert.equal(found.type,'heart');
+ g.pickups=[{x:g.player.x,y:g.player.y,r:16,type:'wings',life:20}];g.update(.05);assert.equal(g.player.speedBoost,8);const before=g.player.x;g.update(.1,{x:1,y:0});assert.ok(g.player.x-before>g.player.speed*.05);for(let i=0;i<161;i++)g.update(.05);assert.equal(g.player.speedBoost,0);
+});
 test('recoger experiencia sube de nivel y pausa hasta elegir una mejora',()=>{
  const g=new Game(CHARACTERS[0],'chunin',42);g.collectXp(g.nextXp);g.update(.016);assert.equal(g.level,2);assert.equal(g.status,'levelup');const t=g.time;g.update(.05);assert.equal(g.time,t);g.upgrade('rasengan');assert.equal(g.skills[0].level,2);assert.equal(g.status,'playing');assert.equal(g.choices().length,3);
 });

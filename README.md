@@ -35,8 +35,9 @@ El build genera `dist/`, listo para alojamiento estático. Node sirve el juego e
 - Muévete con WASD o flechas; Espacio activa un impulso con 3,5 segundos de recarga. Escape pausa. En móvil usa el joystick y el botón de impulso.
 - Tus técnicas atacan automáticamente. Recoge fragmentos de chakra y elige una mejora al subir de nivel.
 - Los pergaminos enseñan una de las cuatro técnicas propias del personaje. Puedes llevar **tres**; el siguiente pergamino permite reemplazar una o conservar el equipo.
+- Corazones del bosque restauran hasta 35 PV; las alas shinobi aumentan la velocidad durante 8 segundos.
 - Sobrevive al menos **9 minutos** y derrota a Shukaku, Gyūki y Kurama. Aparecen a los 2:30, 5:30 y 8:00; un jefe nuevo espera a que derrotes al anterior. El reloj continúa después de nueve minutos si todavía queda algún bijū.
-- Rocas, árboles y lagunas bloquean el movimiento. Los círculos rojos señalan ataques de jefe; el minimapa muestra pergaminos y bijū.
+- Rocas, árboles y lagunas bloquean el movimiento. Los círculos rojos señalan ataques de jefe; el minimapa muestra pergaminos, suministros y bijū.
 - Efectos de sonido opcionales, reducción de movimiento y últimas 20 partidas guardadas en localStorage.
 
 ## Estructura

@@ -4,7 +4,7 @@
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#101512"><meta name="description" content="Elige tu ninja, domina sus jutsus y sobrevive a las bestias con cola. Una aventura de supervivencia en las afueras de Konoha.">
   <title>NaruSurvivor · El camino del shinobi</title>
-  <link rel="icon" href="./assets/leaf.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css?v=1.9">
+  <link rel="icon" href="./assets/leaf.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css?v=1.10">
 </head>
 <body class="title-mode">
   <aside class="sidebar">
@@ -19,7 +19,7 @@
     <button id="sound-toggle" class="sound-toggle" aria-label="Activar sonido">♫ <span>Sonido desactivado</span></button>
     <div class="sidebar-mission"><span class="small-label">LA VOLUNTAD DE FUEGO</span><div class="leaf-emblem">木</div><p>Un ninja nunca se rinde.<br>Tu historia empieza aquí.</p><span class="line"></span><small>ALDEA OCULTA DE LA HOJA</small></div>
     <button class="nav-item settings-link" data-page="settings"><span>⚙</span> Ajustes</button>
-    <div class="build-label"><span class="status-dot"></span> VERSIÓN 1.9 <span>FAN GAME</span></div>
+    <div class="build-label"><span class="status-dot"></span> VERSIÓN 1.10 <span>FAN GAME</span></div>
   </aside>
   <main>
     <header class="topbar"><div><span class="breadcrumb">KONOHAGAKURE</span><span class="breadcrumb-slash">/</span><span id="page-label">Centro de misiones</span></div></header>
@@ -27,7 +27,7 @@
       <div class="title-copy"><span class="title-kicker">ALDEA OCULTA DE LA HOJA PRESENTA</span><h1>NARU<span>SURVIVOR</span></h1><p>EL CAMINO DEL SHINOBI</p></div>
       <button id="title-start" class="title-start">JUGAR<span>▶</span></button>
       <div class="title-menu"><button data-page="characters">SHINOBIS</button><button data-page="codex">GUÍA NINJA</button><button data-page="records">HAZAÑAS</button><button data-page="settings">OPCIONES</button></div>
-      <span class="title-version">v1.9 · PIXEL ART</span>
+      <span class="title-version">v1.10 · PIXEL ART</span>
     </section>
     <div id="play-page" class="page hidden">
       <div class="setup-header"><button id="back-title" class="setup-back">◀ VOLVER</button><span>SELECCIÓN DE MISIÓN</span><span class="setup-stage">BOSQUE DE LA HOJA · 09:00</span></div>
@@ -40,5 +40,5 @@
   </main>
   <section id="game-screen" class="hidden" aria-label="Partida"><canvas id="game-canvas" aria-label="Campo de batalla de Konoha"></canvas><div class="game-top"><div class="player-panel"><div id="player-avatar"></div><div><strong id="hud-name"></strong><div class="health-track"><div id="health-fill"></div></div><small id="hud-health"></small><small id="buff-status" class="buff-status hidden"></small></div><span id="hud-level">NV. 1</span></div><div class="timer-panel"><small>DEFIENDE KONOHA</small><strong id="hud-timer">00:00</strong><span id="hud-kills">0 enemigos</span></div><button id="pause-button" class="icon-button" aria-label="Pausar">Ⅱ</button></div><div class="xp-track"><div id="xp-fill"></div></div><div id="boss-hud" class="hidden"><strong id="boss-name"></strong><div><span id="boss-fill"></span></div></div><div id="game-toast" role="status"></div><div class="game-bottom"><div id="skill-slots"></div><div class="game-controls"><kbd>ESPACIO</kbd> Impulso <span>·</span> <kbd>ESC</kbd> Pausa</div><canvas id="minimap" width="150" height="150" aria-label="Minimapa"></canvas></div><div id="touch-zone" aria-label="Control de movimiento táctil"><div id="touch-knob"></div></div><button id="touch-dash" aria-label="Impulso">↯</button><div id="game-modal" class="modal-layer hidden"></div></section>
   <dialog id="info-dialog"><button id="close-dialog" class="dialog-close" aria-label="Cerrar">×</button><div id="dialog-content"></div></dialog>
-  <script type="module" src="./app.js?v=1.9"></script>
+  <script type="module" src="./app.js?v=1.10"></script>
 </body></html>

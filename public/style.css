@@ -195,3 +195,13 @@ footer{border-top:3px solid #344733}
   .title-menu button { min-height:44px; color:#e9ddba; background:transparent; border:1px solid #4a432d; font:700 9px 'Courier New',monospace; letter-spacing:.6px; }
   .title-version { position:absolute; bottom:73px; right:13px; color:#ddd5bd; font-size:7px; text-shadow:1px 1px #090b08; }
 }
+@media (min-width:581px) {
+  body.title-mode .sidebar { justify-content:space-between; }
+  body.title-mode .sidebar nav,body.title-mode .settings-link,body.title-mode .build-label { display:none!important; }
+  body.title-mode .sound-toggle { margin-left:auto; }
+}
+@media (max-width:580px) {
+  body.title-mode .sidebar nav,body.title-mode .settings-link { display:none!important; }
+  body.title-mode .sidebar { justify-content:flex-end; }
+  body.title-mode .sound-toggle { display:flex; padding:5px 10px; border:1px solid #6f6444; background:#11170fe8; }
+}

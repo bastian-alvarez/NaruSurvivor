@@ -4,7 +4,7 @@
 
 Juego de supervivencia para navegador, con un servidor **Node.js** sin dependencias y renderizado Canvas 2D. Interfaz y controles en español. Proyecto fan no oficial inspirado en Naruto y en el ciclo de juego de Vampire Survivors.
 
-El combate usa un renderizado pixelado de baja resolución con escalado nítido, conservando los sprites y animaciones originales del juego.
+La interfaz, los fondos, retratos y partida usan una dirección pixel art: arte reducido a paleta limitada, cuadrícula sutil y escalado sin suavizado.
 
 ## Ejecutar
 

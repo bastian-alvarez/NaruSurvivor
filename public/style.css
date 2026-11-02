@@ -7,7 +7,9 @@
 .buff-status{display:block!important;color:#a9e4af!important;font-size:8px!important;font-weight:600;letter-spacing:.4px;margin-top:3px;text-shadow:0 1px 5px #07120a}
 /* Primera dirección visual pixel art: contornos firmes y una trama tenue en las fichas. */
 .portrait{background-color:#202b20;background-image:linear-gradient(90deg,#ffffff0b 1px,transparent 1px),linear-gradient(#ffffff0b 1px,transparent 1px),radial-gradient(ellipse at 55% 60%,var(--accent),#1b221e 90%);background-size:12px 12px,12px 12px,auto;background-blend-mode:normal,normal,normal}
-.portrait svg{image-rendering:pixelated;shape-rendering:crispEdges;filter:contrast(1.08) saturate(1.08)}
+.portrait svg,.pixel-portrait{image-rendering:pixelated;shape-rendering:crispEdges;filter:contrast(1.08) saturate(1.08)}
+.portrait .pixel-portrait{width:100%;height:100%;display:block;object-fit:fill}
+#player-avatar .pixel-portrait{width:100%;height:100%;display:block;image-rendering:pixelated;object-fit:fill}
 .character-card,.mission-card,.difficulty-card,.primary-button,.difficulty-options button,.skill-slot,.upgrade-card{border-radius:0}
 .character-card.selected,.primary-button,.skill-slot{box-shadow:3px 3px 0 #080d09}
 .character-card.selected{box-shadow:3px 3px 0 #080d09,0 0 0 1px var(--orange)}

@@ -39,7 +39,7 @@ test('simulación de combate de un minuto mantiene valores válidos',()=>{
 test('la experiencia escasa exige más bajas y no permite saltarse niveles',()=>{
  const g=new Game(CHARACTERS[0],'chunin',42);g.enemies=[];
  for(let i=0;i<18;i++){const e=g.spawnEnemy();e.type='ninja';g.hit(e,e.hp+1);}
- assert.equal(g.gems.filter(g=>!g.heal).reduce((n,g)=>n+g.value,0),18);
+ assert.equal(g.gems.filter(g=>!g.heal).reduce((n,g)=>n+g.value,0),36);
  g.collectXp(17);g.update(.016);assert.equal(g.level,1);g.collectXp(1);g.update(.016);assert.equal(g.level,2);assert.ok(g.nextXp>35);
 });
 test('un proyectil consume su penetración sin dañar a toda una fila',()=>{

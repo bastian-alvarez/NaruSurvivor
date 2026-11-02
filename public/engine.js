@@ -115,15 +115,15 @@ export class Game {
 
 // All game art is drawn locally; the combat never depends on remote images.
 export class Renderer {
- constructor(canvas,minimap){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.minimap=minimap;this.mctx=minimap.getContext('2d');this.width=0;this.height=0;this.camera={x:0,y:0};this.shake=0;this.reducedMotion=false;}
- resize(){const dpr=Math.min(window.devicePixelRatio||1,2);this.width=innerWidth;this.height=innerHeight;this.canvas.width=this.width*dpr;this.canvas.height=this.height*dpr;this.ctx.setTransform(dpr,0,0,dpr,0,0);}
- circle(x,y,r,fill,stroke){const c=this.ctx;c.beginPath();c.arc(x,y,r,0,TAU);if(fill){c.fillStyle=fill;c.fill();}if(stroke){c.strokeStyle=stroke;c.stroke();}}
+ constructor(canvas,minimap){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.pixelCanvas=document.createElement('canvas');this.pixelCtx=this.pixelCanvas.getContext('2d');this.renderCtx=this.pixelCtx;this.pixelScale=1;this.minimap=minimap;this.mctx=minimap.getContext('2d');this.width=0;this.height=0;this.camera={x:0,y:0};this.shake=0;this.reducedMotion=false;}
+ resize(){const dpr=Math.min(window.devicePixelRatio||1,2);this.width=innerWidth;this.height=innerHeight;this.canvas.width=this.width*dpr;this.canvas.height=this.height*dpr;this.ctx.setTransform(dpr,0,0,dpr,0,0);this.pixelScale=dpr/2;this.pixelCanvas.width=Math.ceil(this.width*this.pixelScale);this.pixelCanvas.height=Math.ceil(this.height*this.pixelScale);this.pixelCtx.imageSmoothingEnabled=false;this.pixelCtx.setTransform(this.pixelScale,0,0,this.pixelScale,0,0);}
+ circle(x,y,r,fill,stroke){const c=this.renderCtx||this.ctx;c.beginPath();c.arc(x,y,r,0,TAU);if(fill){c.fillStyle=fill;c.fill();}if(stroke){c.strokeStyle=stroke;c.stroke();}}
  ninja(x,y,character,scale=1,time=0,moving=false,facing=1,enemy=false,flash=false){
-  drawShinobi(this.ctx,x,y,character,scale,time,moving,facing,enemy,flash);
+  drawShinobi(this.renderCtx||this.ctx,x,y,character,scale,time,moving,facing,enemy,flash);
  }
- boss(e,time){drawBijuu(this.ctx,e,time);}
+ boss(e,time){drawBijuu(this.renderCtx||this.ctx,e,time);}
  draw(game){
-  const c=this.ctx,p=game.player,w=this.width,h=this.height;const zoom=w<600?.9:1.1,vw=w/zoom,vh=h/zoom;
+  const c=this.pixelCtx;this.renderCtx=c;const p=game.player,w=this.width,h=this.height;const zoom=w<600?.9:1.1,vw=w/zoom,vh=h/zoom;
   this.camera={x:clamp(p.x-vw/2,-30,WORLD-vw+30),y:clamp(p.y-vh/2,-30,WORLD-vh+30)};const cam=this.camera;
   c.save();c.scale(zoom,zoom);if(this.shake>0&&!this.reducedMotion){c.translate((Math.random()-.5)*6,(Math.random()-.5)*6);this.shake-=.03;}c.translate(-cam.x,-cam.y);
   if(this.groundGame!==game){this.ground=makeGround(game,WORLD);this.groundGame=game;}
@@ -160,7 +160,7 @@ export class Renderer {
   for(const tree of trees.sort((a,b)=>a.y-b.y)){drawTree(c,tree,distance(tree,p)<tree.r+62?.28:1);}
   // Drifting leaves and softly lit forest haze.
   if(!this.reducedMotion){for(let i=0;i<12;i++){const x=cam.x+((i*137+game.time*13)%vw),y=cam.y+((i*97+game.time*19)%vh);c.save();c.translate(x,y);c.rotate(game.time+i);c.fillStyle='#c6b36d88';c.fillRect(-2,-1,5,2);c.restore();}}
-  c.restore();const vignette=c.createRadialGradient(w/2,h/2,h*.2,w/2,h/2,Math.max(w,h)*.65);vignette.addColorStop(0,'#09180e00');vignette.addColorStop(1,'#09180e88');c.fillStyle=vignette;c.fillRect(0,0,w,h);this.drawMap(game);
+  c.restore();const vignette=c.createRadialGradient(w/2,h/2,h*.2,w/2,h/2,Math.max(w,h)*.65);vignette.addColorStop(0,'#09180e00');vignette.addColorStop(1,'#09180e88');c.fillStyle=vignette;c.fillRect(0,0,w,h);this.ctx.setTransform(Math.min(window.devicePixelRatio||1,2),0,0,Math.min(window.devicePixelRatio||1,2),0,0);this.ctx.imageSmoothingEnabled=false;this.ctx.clearRect(0,0,w,h);this.ctx.drawImage(this.pixelCanvas,0,0,w,h);this.renderCtx=c;this.drawMap(game);
  }
  drawMap(game){const c=this.mctx,s=150/WORLD;c.clearRect(0,0,150,150);c.fillStyle='#263d2a';c.fillRect(0,0,150,150);for(const o of game.obstacles){c.fillStyle=o.type==='water'?'#59988d':o.type==='rock'?'#889078':'#3b5c38';c.beginPath();c.arc(o.x*s,o.y*s,o.r*s+1,0,TAU);c.fill();}for(const scroll of game.scrolls){c.fillStyle='#e9ba68';c.fillRect(scroll.x*s-2,scroll.y*s-2,4,4);}for(const item of game.pickups){c.fillStyle=item.type==='heart'?'#ff917e':'#a5e6b3';c.beginPath();c.arc(item.x*s,item.y*s,3,0,TAU);c.fill();}for(const e of game.enemies.filter(e=>e.type==='boss')){c.fillStyle='#ef9467';c.beginPath();c.arc(e.x*s,e.y*s,4,0,TAU);c.fill();}c.fillStyle='#f2e8bd';c.beginPath();c.arc(game.player.x*s,game.player.y*s,3,0,TAU);c.fill();c.strokeStyle='#d3e3c13f';c.strokeRect(this.camera.x*s,this.camera.y*s,this.width/(this.width<600?.9:1.1)*s,this.height/(this.width<600?.9:1.1)*s);}
 }
